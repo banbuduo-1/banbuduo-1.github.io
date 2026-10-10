@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f1226">
+<title>游戏书签</title>
+<!-- 独立样式文件 -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>游戏书签</h1>
+    <p>点击卡片直接进入游戏 · 可在多条线路间自由切换</p>
+  </header>
+
+  <!-- 全局一键切换所有账号线路 -->
+  <div class="global-bar">
+    <span class="label">全部账号</span>
+    <button class="swap-btn" id="swapAll">
+      <span class="ico">⇄</span><span>一键切换线路</span>
+    </button>
+  </div>
+  <!-- 线路图例：由 app.js 根据 data.js 中的线路动态生成 -->
+  <p class="hint">线路 <span id="legend"></span> · 选择自动保存，下次打开保持不变</p>
+
+  <!-- 账号卡片列表容器 -->
+  <main id="groups"></main>
+  <footer>共 <span id="total"></span> 个账号 · 本地多文件，手机电脑均可打开</footer>
+</div>
+
+<!-- 轻提示容器 -->
+<div id="toast"></div>
+
+<!-- 数据文件：线路与账号（token 过期时编辑此文件） -->
+<script src="data.js"></script>
+<!-- 交互逻辑：依赖上方 data.js -->
+<script src="app.js"></script>
+</body>
+</html>

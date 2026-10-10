@@ -1,0 +1,282 @@
+/* ============================================================
+   游戏书签页样式表
+   深色主题卡片布局，适配手机与电脑
+   ============================================================ */
+
+/* ===== 基础重置 ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent; /* 去除移动端点击高亮 */
+}
+
+:root {
+  --card: rgba(255, 255, 255, 0.06);   /* 卡片底色 */
+  --card-br: rgba(255, 255, 255, 0.10);/* 卡片描边 */
+  --txt: #eef0ff;                      /* 主文字色 */
+  --sub: #9aa0c3;                      /* 次要文字色 */
+  --acc: #a78bfa;                      /* 强调色 */
+}
+
+body {
+  font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  /* 多层径向 + 线性渐变构成深色星空背景 */
+  background:
+    radial-gradient(1200px 800px at 80% -10%, #2b1a5e 0%, transparent 60%),
+    radial-gradient(1000px 700px at -10% 110%, #12305e 0%, transparent 55%),
+    linear-gradient(160deg, #0f1226, #1a1040);
+  background-attachment: fixed;
+  color: var(--txt);
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 16px;
+}
+
+/* ===== 头部 ===== */
+header {
+  text-align: center;
+  padding: 26px 0 10px;
+}
+header h1 {
+  font-size: 26px;
+  letter-spacing: 2px;
+  /* 渐变文字 */
+  background: linear-gradient(90deg, #a78bfa, #60a5fa, #34d399);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+header p {
+  color: var(--sub);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+/* ===== 全局切换条（吸顶） ===== */
+.global-bar {
+  position: sticky;
+  top: 10px;
+  z-index: 50;
+  margin: 18px auto 6px;
+  max-width: 640px;
+  background: rgba(20, 22, 48, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--card-br);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+.global-bar .label {
+  font-size: 13px;
+  color: var(--sub);
+  white-space: nowrap;
+}
+.swap-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  padding: 12px 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(90deg, #16a34a, #a78bfa 55%, #2563eb);
+  transition: transform 0.15s, filter 0.15s;
+}
+.swap-btn:active {
+  transform: scale(0.97);
+  filter: brightness(1.15);
+}
+.swap-btn .ico {
+  display: inline-block;
+  transition: transform 0.35s;
+}
+.swap-btn.spun .ico {
+  transform: rotate(180deg); /* 切换动画：图标旋转半圈 */
+}
+
+/* 线路图例提示 */
+.hint {
+  text-align: center;
+  color: var(--sub);
+  font-size: 12px;
+  margin: 10px 0 4px;
+}
+.hint .legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 2px;
+}
+.hint .dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* ===== 分组 ===== */
+.group {
+  margin-top: 22px;
+}
+.group-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 2px 12px;
+}
+.group-title .bar {
+  width: 4px;
+  height: 18px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--acc), #3b82f6);
+}
+.group-title .count {
+  font-size: 12px;
+  color: var(--sub);
+  font-weight: 400;
+}
+
+/* ===== 卡片网格 ===== */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+/* 极窄屏（小手机）固定两列 */
+@media (max-width: 380px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--card-br);
+  border-radius: 14px;
+  padding: 14px 10px 10px;
+  text-decoration: none;
+  color: var(--txt);
+  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+}
+.card:active {
+  transform: scale(0.96);
+}
+/* 桌面端悬停反馈 */
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(167, 139, 250, 0.5);
+    background: rgba(255, 255, 255, 0.09);
+  }
+}
+
+/* 圆形头像（取名字前两字） */
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--c1, #6366f1), var(--c2, #8b5cf6));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+.name {
+  font-size: 15px;
+  font-weight: 600;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 线路徽章：颜色由 JS 根据当前线路动态设置 */
+.badge {
+  margin-top: 6px;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+  border: 1px solid;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* 卡片操作按钮 */
+.ops {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.op {
+  border: 1px solid var(--card-br);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--sub);
+  border-radius: 9px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.op:active {
+  transform: scale(0.93);
+}
+@media (hover: hover) {
+  .op:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.14);
+  }
+}
+
+/* ===== Toast 轻提示 ===== */
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 36px;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(30, 32, 64, 0.95);
+  color: #fff;
+  border: 1px solid var(--card-br);
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s;
+  z-index: 99;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+footer {
+  text-align: center;
+  color: var(--sub);
+  font-size: 11px;
+  margin-top: 34px;
+}
