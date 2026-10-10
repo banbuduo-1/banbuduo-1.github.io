@@ -30,12 +30,30 @@
     return DATA.lines[0];
   }
 
-  /** 读取某账号当前使用的线路 id（有缓存用缓存，否则用默认线路） */
+  /** 按域名查找线路；找不到返回 null */
+  function lineByHost(host) {
+    for (let i = 0; i < DATA.lines.length; i++) {
+      if (DATA.lines[i].host === host) return DATA.lines[i];
+    }
+    return null;
+  }
+
+  /** 从账号 url 的域名推断默认线路 id；匹配不到时回退到第一条线路 */
+  function defaultLineId(acct) {
+    try {
+      const line = lineByHost(new URL(acct.url).host);
+      return line ? line.id : DATA.lines[0].id;
+    } catch (e) {
+      return DATA.lines[0].id; // url 格式非法时兜底
+    }
+  }
+
+  /** 读取某账号当前使用的线路 id（有缓存用缓存，否则根据 url 域名判断） */
   function currentLineId(gi, acct) {
     const key = LS_PREFIX + gi + "." + acct.name;
     const saved = localStorage.getItem(key);
     if (saved && lineById(saved)) return saved; // 缓存存在且线路有效
-    return lineById(acct.defaultLine) ? acct.defaultLine : DATA.lines[0].id;
+    return defaultLineId(acct);
   }
 
   /** 保存某账号的线路选择 */
@@ -54,9 +72,15 @@
 
   /* ==================== 链接构建 ==================== */
 
-  /** 根据线路域名 + 账号登录参数拼出完整登录链接 */
-  function buildUrl(line, query) {
-    return "https://" + line.host + "/login.php?" + query;
+  /** 把账号的完整登录链接切换到指定线路：仅替换域名部分，路径与参数保持不变 */
+  function buildUrl(line, url) {
+    try {
+      const u = new URL(url);
+      u.host = line.host; // 替换为目标线路域名
+      return u.toString();
+    } catch (e) {
+      return url; // url 格式非法时原样返回
+    }
   }
 
   /* ==================== 字符串转义 ==================== */
@@ -96,7 +120,7 @@
         const c = COLORS[(gi * 7 + ai) % COLORS.length]; // 头像配色
         total++;
         cards +=
-          '<a class="card" href="' + esc(buildUrl(line, acct.query)) + '" target="_blank" rel="noopener">' +
+          '<a class="card" href="' + esc(buildUrl(line, acct.url)) + '" target="_blank" rel="noopener">' +
             '<div class="avatar" style="--c1:' + c[0] + ";--c2:" + c[1] + '">' +
               esc(acct.name.slice(0, 2)) + "</div>" +
             '<div class="name" title="' + esc(acct.name) + '">' + esc(acct.name) + "</div>" +
