@@ -1,7 +1,7 @@
 // ============================================================
 // 游戏书签页交互逻辑
-// 功能：渲染账号卡片、多线路循环切换、一键切换全部、
-//       复制登录链接，并用 localStorage 记住每个账号的线路选择。
+// 功能：渲染账号卡片、多线路循环切换、一键切换全部，
+//       并用 localStorage 记住线路选择。
 // 依赖：data.js 中定义的 window.APP_DATA（由外部脚本先加载）
 // ============================================================
 (function () {
@@ -102,10 +102,6 @@
             '<div class="name" title="' + esc(acct.name) + '">' + esc(acct.name) + "</div>" +
             '<span class="badge" style="color:' + line.color + ";border-color:" + line.color + '">' +
               esc(line.name) + " 线路</span>" +
-            '<div class="ops">' +
-              '<button class="op swap" data-gi="' + gi + '" data-ai="' + ai + '" title="切换此账号线路">⇄ 切换</button>' +
-              '<button class="op copy" data-gi="' + gi + '" data-ai="' + ai + '" title="复制登录链接">⧉ 复制</button>' +
-            "</div>" +
           "</a>";
       });
 
@@ -132,61 +128,7 @@
     toastTimer = setTimeout(() => t.classList.remove("show"), 1600);
   }
 
-  /* ==================== 复制到剪贴板 ==================== */
-
-  /** 复制文本，优先使用剪贴板 API，失败则降级 */
-  function copyText(text) {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(
-        () => toast("链接已复制"),
-        () => fallbackCopy(text)
-      );
-    } else {
-      fallbackCopy(text);
-    }
-  }
-
-  /** 剪贴板 API 不可用时的降级复制方案 */
-  function fallbackCopy(text) {
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    ta.style.cssText = "position:fixed;opacity:0";
-    document.body.appendChild(ta);
-    ta.select();
-    try {
-      document.execCommand("copy");
-      toast("链接已复制");
-    } catch (e) {
-      toast("复制失败，请长按链接复制");
-    }
-    document.body.removeChild(ta);
-  }
-
   /* ==================== 事件绑定 ==================== */
-
-  // 事件委托：处理卡片内「切换 / 复制」按钮点击（阻止触发卡片跳转）
-  document.getElementById("groups").addEventListener("click", (e) => {
-    const swapBtn = e.target.closest(".op.swap");
-    const copyBtn = e.target.closest(".op.copy");
-    if (!swapBtn && !copyBtn) return; // 点击卡片其他区域 => 正常打开链接
-    e.preventDefault();
-    e.stopPropagation();
-
-    const gi = +(swapBtn ? swapBtn.getAttribute("data-gi") : copyBtn.getAttribute("data-gi"));
-    const ai = +(swapBtn ? swapBtn.getAttribute("data-ai") : copyBtn.getAttribute("data-ai"));
-    const acct = DATA.groups[gi].accounts[ai];
-
-    if (swapBtn) {
-      // 单账号切换到下一条线路（循环）
-      const nextId = nextLineId(currentLineId(gi, acct));
-      saveLineId(gi, acct, nextId);
-      render();
-      toast("「" + acct.name + "」已切到 " + lineById(nextId).name + " 线路");
-    } else {
-      // 复制当前线路的登录链接
-      copyText(buildUrl(lineById(currentLineId(gi, acct)), acct.query));
-    }
-  });
 
   // 一键切换：所有账号同时切到下一条线路
   document.getElementById("swapAll").addEventListener("click", function () {

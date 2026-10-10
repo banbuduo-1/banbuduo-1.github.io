@@ -225,32 +225,6 @@ header p {
   background: rgba(255, 255, 255, 0.06);
 }
 
-/* 卡片操作按钮 */
-.ops {
-  display: flex;
-  gap: 6px;
-  margin-top: 10px;
-}
-.op {
-  border: 1px solid var(--card-br);
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--sub);
-  border-radius: 9px;
-  padding: 6px 10px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.op:active {
-  transform: scale(0.93);
-}
-@media (hover: hover) {
-  .op:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.14);
-  }
-}
-
 /* ===== Toast 轻提示 ===== */
 #toast {
   position: fixed;
