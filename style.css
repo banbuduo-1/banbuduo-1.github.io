@@ -111,6 +111,10 @@ body {
   transform: scale(0.97);
   background: rgba(34, 197, 94, 0.25);
 }
+/* 移动端隐藏下载按钮（.exe 只给 PC 用） */
+@media (max-width: 640px) {
+  .dl-btn { display: none; }
+}
 
 /* ===== 分组 ===== */
 .group {
