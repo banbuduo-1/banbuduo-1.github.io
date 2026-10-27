@@ -10,15 +10,8 @@
   // 书签数据：包含 lines(线路数组) 与 groups(账号分组)
   const DATA = window.APP_DATA;
 
-  // localStorage 键前缀：按「分组索引.账号名」记录当前线路 id
-  const LS_PREFIX = "bm.line.";
-
-  // 头像渐变配色（循环取用，让卡片头像颜色多样）
-  const COLORS = [
-    ["#6366f1", "#a855f7"], ["#0ea5e9", "#6366f1"], ["#f43f5e", "#f97316"],
-    ["#10b981", "#14b8a6"], ["#f59e0b", "#ef4444"], ["#8b5cf6", "#ec4899"],
-    ["#06b6d4", "#3b82f6"], ["#84cc16", "#22c55e"],
-  ];
+  // localStorage 键：全局线路 id（所有账号共用同一条线路）
+  const LS_KEY = "bm.line";
 
   /* ==================== 工具函数 ==================== */
 
@@ -38,27 +31,28 @@
     return null;
   }
 
-  /** 从账号 url 的域名推断默认线路 id；匹配不到时回退到第一条线路 */
+  /** 从账号 url 域名推断默认线路 id（用于首次打开时的兜底） */
   function defaultLineId(acct) {
     try {
       const line = lineByHost(new URL(acct.url).host);
       return line ? line.id : DATA.lines[0].id;
     } catch (e) {
-      return DATA.lines[0].id; // url 格式非法时兜底
+      return DATA.lines[0].id;
     }
   }
 
-  /** 读取某账号当前使用的线路 id（有缓存用缓存，否则根据 url 域名判断） */
-  function currentLineId(gi, acct) {
-    const key = LS_PREFIX + gi + "." + acct.name;
-    const saved = localStorage.getItem(key);
+  /** 获取当前全局线路 id */
+  function getGlobalLineId() {
+    const saved = localStorage.getItem(LS_KEY);
     if (saved && lineById(saved)) return saved; // 缓存存在且线路有效
-    return defaultLineId(acct);
+    // 首次打开：取第一个账号的默认线路
+    const first = DATA.groups[0] && DATA.groups[0].accounts[0];
+    return first ? defaultLineId(first) : DATA.lines[0].id;
   }
 
-  /** 保存某账号的线路选择 */
-  function saveLineId(gi, acct, id) {
-    localStorage.setItem(LS_PREFIX + gi + "." + acct.name, id);
+  /** 保存全局线路 id */
+  function saveGlobalLineId(id) {
+    localStorage.setItem(LS_KEY, id);
   }
 
   /** 计算某条线路的「下一条」线路 id（循环） */
@@ -96,49 +90,42 @@
 
   /* ==================== 渲染 ==================== */
 
-  /** 渲染顶部线路图例（列出所有线路的色点与名称） */
-  function renderLegend() {
-    const el = document.getElementById("legend");
-    if (!el) return;
-    const parts = DATA.lines.map((l) =>
-      '<span class="legend"><span class="dot" style="background:' + l.color + '"></span>' +
-      esc(l.name) + "</span>"
-    );
-    el.innerHTML = parts.join('<span class="legend" style="opacity:.5">⇄</span>');
-  }
-
-  /** 渲染所有分组与账号卡片 */
+  /** 渲染所有分组与账号卡片（共用全局线路） */
   function render() {
     const root = document.getElementById("groups");
+    const line = lineById(getGlobalLineId()); // 所有账号共用全局线路
     let html = "";
     let total = 0;
 
-    DATA.groups.forEach((g, gi) => {
+    DATA.groups.forEach((g) => {
       let cards = "";
-      g.accounts.forEach((acct, ai) => {
-        const line = lineById(currentLineId(gi, acct)); // 当前线路
-        const c = COLORS[(gi * 7 + ai) % COLORS.length]; // 头像配色
+      g.accounts.forEach((acct) => {
         total++;
         cards +=
           '<a class="card" href="' + esc(buildUrl(line, acct.url)) + '" target="_blank" rel="noopener">' +
-            '<div class="avatar" style="--c1:' + c[0] + ";--c2:" + c[1] + '">' +
-              esc(acct.name.slice(0, 2)) + "</div>" +
             '<div class="name" title="' + esc(acct.name) + '">' + esc(acct.name) + "</div>" +
-            '<span class="badge" style="color:' + line.color + ";border-color:" + line.color + '">' +
-              esc(line.name) + " 线路</span>" +
           "</a>";
       });
 
       html +=
         '<section class="group">' +
           '<div class="group-title"><span class="bar"></span>' + esc(g.name) +
-            '<span class="count">' + g.accounts.length + " 个账号</span></div>" +
+            '<span class="count">' + g.accounts.length + " 个账号</span>" +
+            '<button class="open-group" type="button">全部打开</button>' +
+          "</div>" +
           '<div class="grid">' + cards + "</div>" +
         "</section>";
     });
 
     root.innerHTML = html;
     document.getElementById("total").textContent = total;
+
+    // 更新底部悬浮条里的当前线路名和颜色
+    const cur = document.getElementById("curLine");
+    if (cur) {
+      cur.textContent = line.name;
+      cur.style.color = line.color;
+    }
   }
 
   /* ==================== Toast 提示 ==================== */
@@ -154,19 +141,32 @@
 
   /* ==================== 事件绑定 ==================== */
 
-  // 一键切换：所有账号同时切到下一条线路
+  // 一键切换：全局线路切到下一条，所有账号一起生效
   document.getElementById("swapAll").addEventListener("click", function () {
-    DATA.groups.forEach((g, gi) => {
-      g.accounts.forEach((acct) => {
-        saveLineId(gi, acct, nextLineId(currentLineId(gi, acct)));
-      });
-    });
+    const next = nextLineId(getGlobalLineId());
+    saveGlobalLineId(next);
     render();
     this.classList.toggle("spun"); // 按钮图标旋转动画反馈
-    toast("已切换全部账号线路");
+    toast("已切换到 " + lineById(next).name + " 线路");
+  });
+
+  // 事件委托：每个分组标题的「全部打开」按钮，循环打开该分组下所有账号
+  document.getElementById("groups").addEventListener("click", function (e) {
+    const btn = e.target.closest(".open-group");
+    if (!btn) return;
+    // 找到该按钮所在的 section，再取里面所有卡片的链接
+    const section = btn.closest(".group");
+    const cards = section.querySelectorAll(".card[href]");
+    if (!cards.length) return;
+    // 逐个延迟打开：让每个 window.open 仍在用户手势作用域内，避免弹窗拦截
+    cards.forEach((c, i) => {
+      setTimeout(() => {
+        window.open(c.href, "_blank", "noopener");
+      }, i * 180);
+    });
+    toast("正在打开 " + cards.length + " 个页面…");
   });
 
   // 初始化渲染
-  renderLegend();
   render();
 })();

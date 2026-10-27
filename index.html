@@ -10,20 +10,13 @@
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <h1>游戏书签</h1>
-    <p>点击卡片直接进入游戏 · 可在多条线路间自由切换</p>
-  </header>
-
   <!-- 全局一键切换所有账号线路 -->
   <div class="global-bar">
-    <span class="label">全部账号</span>
+    <span class="label">当前线路：<b id="curLine">—</b></span>
     <button class="swap-btn" id="swapAll">
-      <span class="ico">⇄</span><span>一键切换线路</span>
+      <span class="ico">⇄</span><span>切换线路</span>
     </button>
   </div>
-  <!-- 线路图例：由 app.js 根据 data.js 中的线路动态生成 -->
-  <p class="hint">线路 <span id="legend"></span> · 选择自动保存，下次打开保持不变</p>
 
   <!-- 账号卡片列表容器 -->
   <main id="groups"></main>
