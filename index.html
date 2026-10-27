@@ -168,11 +168,12 @@
     },
 
     methods: {
-      /** 把账号 url 的域名替换成当前线路 */
+      /** 把账号 url 的域名和入口路径都替换成当前线路，查询参数原样保留 */
       buildUrl: function (url) {
         try {
           var u = new URL(url);
           u.host = this.renderLine.host;
+          u.pathname = this.renderLine.path || "/"; // 兜底：path 没配就用根路径
           return u.toString();
         } catch (e) {
           return url;

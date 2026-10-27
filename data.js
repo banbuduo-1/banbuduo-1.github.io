@@ -10,7 +10,8 @@
 //
 // 【如何新增一条线路（域名）】
 //   在 lines 数组末尾追加一项，例如：
-//   { "id": "xx", "name": "新域名", "host": "xxx.example.com", "color": "#f59e0b" }
+//   { "id": "xx", "name": "新域名", "host": "xxx.example.com", "path": "/login.php", "color": "#f59e0b" }
+//   path 表示登录入口路径，不同线路可能不同（/login.php 或 /dldl 等）。
 //   之后在页面上每个账号切换线路时即可循环选到它。
 //   账号的默认线路会根据 url 中的域名自动匹配 lines 里的 host，
 //   无需手动指定；匹配不到时回退到第一条线路。
@@ -25,25 +26,29 @@ window.APP_DATA = {
       "id": "1",
       "name": "50pk",
       "host": "dldl.50pk.com",
+      "path": "/login.php",
       "color": "#22c55e"
     },
     {
       "id": "2",
       "name": "z7xz",
       "host": "app.xxh5.z7xz.com",
-      "color": "#22c55e"
+      "path": "/login.php",
+      "color": "#3b82f6"
     },
     {
       "id": "3",
       "name": "七兔",
-      "host": "72.cheinapp.com/e",
-      "color": "#22c55e"
+      "host": "7tu7tu.com",
+      "path": "/dldl",
+      "color": "#f97316"
     },
     {
       "id": "4",
       "name": "新玩",
       "host": "xinwan.xinwanwl.com",
-      "color": "#22c55e"
+      "path": "/login.php",
+      "color": "#a855f7"
     }
   ],
   "groups": [
