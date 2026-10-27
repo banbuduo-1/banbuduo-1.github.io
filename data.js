@@ -22,16 +22,28 @@
 window.APP_DATA = {
   "lines": [
     {
-      "id": "50pk",
+      "id": "1",
       "name": "50pk",
       "host": "dldl.50pk.com",
       "color": "#22c55e"
     },
     {
-      "id": "z7xz",
+      "id": "2",
       "name": "z7xz",
       "host": "app.xxh5.z7xz.com",
-      "color": "#3b82f6"
+      "color": "#22c55e"
+    },
+    {
+      "id": "3",
+      "name": "七兔",
+      "host": "72.cheinapp.com/e",
+      "color": "#22c55e"
+    },
+    {
+      "id": "4",
+      "name": "新玩",
+      "host": "xinwan.xinwanwl.com",
+      "color": "#22c55e"
     }
   ],
   "groups": [

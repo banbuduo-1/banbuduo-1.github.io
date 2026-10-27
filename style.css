@@ -82,17 +82,34 @@ body {
   color: #fff;
   background: linear-gradient(90deg, #16a34a, #a78bfa 55%, #2563eb);
   transition: transform 0.15s, filter 0.15s;
+  text-decoration: none;
 }
 .swap-btn:active {
   transform: scale(0.97);
   filter: brightness(1.15);
 }
-.swap-btn .ico {
-  display: inline-block;
-  transition: transform 0.35s;
+
+/* 下载游戏按钮（独立样式，避免被渐变背景抢视觉） */
+.dl-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  border-radius: 12px;
+  cursor: pointer;
+  padding: 12px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.12);
+  text-decoration: none;
+  transition: transform 0.15s, background 0.15s;
 }
-.swap-btn.spun .ico {
-  transform: rotate(180deg); /* 切换动画：图标旋转半圈 */
+.dl-btn:active {
+  transform: scale(0.97);
+  background: rgba(34, 197, 94, 0.25);
 }
 
 /* ===== 分组 ===== */
@@ -194,4 +211,106 @@ footer {
   color: var(--sub);
   font-size: 11px;
   margin-top: 34px;
+}
+
+/* ===== 线路选择弹窗 ===== */
+.picker-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 20, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+}
+.picker-panel {
+  width: 100%;
+  max-width: 480px;
+  background: #1a1d3a;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 18px 16px 24px;
+  border: 1px solid var(--card-br);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
+}
+.picker-title {
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 14px;
+  color: var(--txt);
+}
+.picker-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.picker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid var(--card-br);
+  border-radius: 12px;
+  color: var(--txt);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.picker-item:active {
+  transform: scale(0.97);
+}
+.picker-item.active {
+  background: rgba(167, 139, 250, 0.15);
+  font-weight: 700;
+}
+.picker-item .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.picker-item .ln-name {
+  flex: 1;
+  text-align: left;
+}
+.picker-item .ln-current {
+  font-size: 11px;
+  color: #a78bfa;
+  font-weight: 600;
+}
+.picker-close {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--card-br);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--sub);
+  font-size: 14px;
+  cursor: pointer;
+}
+.picker-close:active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 弹窗淡入淡出过渡 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+.fade-enter-active .picker-panel,
+.fade-leave-active .picker-panel {
+  transition: transform 0.22s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-enter .picker-panel,
+.fade-leave-to .picker-panel {
+  transform: translateY(100%);
 }

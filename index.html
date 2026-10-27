@@ -14,12 +14,15 @@
 <!-- Vue 应用根节点 -->
 <div id="app" class="wrap">
 
-  <!-- 底部悬浮：全局线路切换条 -->
+  <!-- 底部悬浮：全局线路切换条 + 下载按钮 -->
   <div class="global-bar">
     <span class="label">当前线路：<b :style="{ color: renderLine.color }">{{ renderLine.name }}</b></span>
-    <button class="swap-btn" @click="swapLine" :class="{ spun: spun }">
-      <span class="ico">⇄</span><span>切换线路</span>
+    <button class="swap-btn" @click="openPicker">
+      <span class="ico">⇄</span><span>选择线路</span>
     </button>
+    <a class="dl-btn" href="https://dl.hz.37.com.cn/%E6%96%97%E7%BD%97%E5%A4%A7%E9%99%86H5.exe" download>
+      <span class="ico">⬇</span><span>下载游戏</span>
+    </a>
   </div>
 
   <!-- 分组与卡片列表 -->
@@ -41,6 +44,28 @@
   </main>
 
   <footer>共 {{ total }} 个账号 · 本地多文件，手机电脑均可打开</footer>
+
+  <!-- 线路选择弹窗（Vue 控制显示/隐藏） -->
+  <transition name="fade">
+    <div v-if="showPicker" class="picker-mask" @click.self="closePicker">
+      <div class="picker-panel">
+        <div class="picker-title">选择线路</div>
+        <div class="picker-list">
+          <button v-for="ln in lineList"
+                  :key="ln.id"
+                  class="picker-item"
+                  :class="{ active: ln.id === lineId }"
+                  :style="{ borderColor: ln.color }"
+                  @click="selectLine(ln)">
+            <span class="dot" :style="{ background: ln.color }"></span>
+            <span class="ln-name">{{ ln.name }}</span>
+            <span v-if="ln.id === lineId" class="ln-current">当前</span>
+          </button>
+        </div>
+        <button class="picker-close" @click="closePicker">取消</button>
+      </div>
+    </div>
+  </transition>
 </div>
 
 <!-- 轻提示容器 -->
@@ -88,16 +113,6 @@
     }
   }
 
-  /** 计算下一条线路 id（循环） */
-  function nextLineId(curId) {
-    var len = DATA.lines.length;
-    var idx = 0;
-    for (var i = 0; i < len; i++) {
-      if (DATA.lines[i].id === curId) { idx = i; break; }
-    }
-    return DATA.lines[(idx + 1) % len].id;
-  }
-
   /** 安全读取 localStorage（file:// 下可能被拦截） */
   function lsGet(key) {
     try { return localStorage.getItem(key); } catch (e) { return null; }
@@ -120,7 +135,7 @@
     data: function () {
       return {
         lineId: initialLineId, // 当前全局线路 id
-        spun: false,           // 切换按钮旋转动画状态
+        showPicker: false,     // 线路选择弹窗显隐
       };
     },
 
@@ -128,6 +143,10 @@
       // 当前线路对象（含 id / name / host / color）
       renderLine: function () {
         return lineById(this.lineId);
+      },
+      // 所有线路（供弹窗 v-for 使用）
+      lineList: function () {
+        return DATA.lines;
       },
       // 分组列表透传给模板
       groups: function () {
@@ -160,11 +179,21 @@
         }
       },
 
-      /** 切换到下一条线路 */
-      swapLine: function () {
-        this.lineId = nextLineId(this.lineId);
-        this.spun = !this.spun;
-        this.toast("已切换到 " + this.renderLine.name + " 线路");
+      /** 打开线路选择弹窗 */
+      openPicker: function () {
+        this.showPicker = true;
+      },
+
+      /** 关闭线路选择弹窗 */
+      closePicker: function () {
+        this.showPicker = false;
+      },
+
+      /** 选定一条线路并应用 */
+      selectLine: function (ln) {
+        this.lineId = ln.id;
+        this.showPicker = false;
+        this.toast("已切换到 " + ln.name + " 线路");
       },
 
       /** 轻提示 */
