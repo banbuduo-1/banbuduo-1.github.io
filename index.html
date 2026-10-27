@@ -5,22 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0f1226">
 <title>游戏书签</title>
-<!-- 独立样式文件 -->
+<!-- 样式文件 -->
 <link rel="stylesheet" href="style.css">
+<!-- Vue 2 CDN 版 -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
 </head>
 <body>
-<div class="wrap">
-  <!-- 全局一键切换所有账号线路 -->
+<!-- Vue 应用根节点 -->
+<div id="app" class="wrap">
+
+  <!-- 底部悬浮：全局线路切换条 -->
   <div class="global-bar">
-    <span class="label">当前线路：<b id="curLine">—</b></span>
-    <button class="swap-btn" id="swapAll">
+    <span class="label">当前线路：<b :style="{ color: renderLine.color }">{{ renderLine.name }}</b></span>
+    <button class="swap-btn" @click="swapLine" :class="{ spun: spun }">
       <span class="ico">⇄</span><span>切换线路</span>
     </button>
   </div>
 
-  <!-- 账号卡片列表容器 -->
-  <main id="groups"></main>
-  <footer>共 <span id="total"></span> 个账号 · 本地多文件，手机电脑均可打开</footer>
+  <!-- 分组与卡片列表 -->
+  <main>
+    <section v-for="(g, gi) in groups" :key="gi" class="group">
+      <div class="group-title">
+        <span class="bar"></span>{{ g.name }}
+        <span class="count">{{ g.accounts.length }} 个账号</span>
+      </div>
+      <div class="grid">
+        <a v-for="(acct, ai) in g.accounts" :key="gi + '-' + ai"
+           class="card"
+           :href="buildUrl(acct.url)"
+           target="_blank" rel="noopener">
+          <div class="name" :title="acct.name">{{ acct.name }}</div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>共 {{ total }} 个账号 · 本地多文件，手机电脑均可打开</footer>
 </div>
 
 <!-- 轻提示容器 -->
@@ -28,7 +48,140 @@
 
 <!-- 数据文件：线路与账号（token 过期时编辑此文件） -->
 <script src="data.js"></script>
-<!-- 交互逻辑：依赖上方 data.js -->
-<script src="app.js"></script>
+
+<!-- ===== Vue 应用（内联） ===== -->
+<script>
+(function () {
+  "use strict";
+
+  // localStorage 键：全局线路 id（所有账号共用同一条线路）
+  var LS_KEY = "bm.line";
+
+  // data.js 加载后挂在 window.APP_DATA
+  var DATA = window.APP_DATA;
+
+  /** 按 id 查找线路；找不到则回退到第一条 */
+  function lineById(id) {
+    if (!id) return DATA.lines[0];
+    for (var i = 0; i < DATA.lines.length; i++) {
+      if (DATA.lines[i].id === id) return DATA.lines[i];
+    }
+    return DATA.lines[0];
+  }
+
+  /** 按域名查找线路；找不到返回 null */
+  function lineByHost(host) {
+    for (var i = 0; i < DATA.lines.length; i++) {
+      if (DATA.lines[i].host === host) return DATA.lines[i];
+    }
+    return null;
+  }
+
+  /** 从账号 url 域名推断线路 id（首次打开兜底） */
+  function defaultLineId(acct) {
+    try {
+      var u = new URL(acct.url);
+      var line = lineByHost(u.host);
+      return line ? line.id : DATA.lines[0].id;
+    } catch (e) {
+      return DATA.lines[0].id;
+    }
+  }
+
+  /** 计算下一条线路 id（循环） */
+  function nextLineId(curId) {
+    var len = DATA.lines.length;
+    var idx = 0;
+    for (var i = 0; i < len; i++) {
+      if (DATA.lines[i].id === curId) { idx = i; break; }
+    }
+    return DATA.lines[(idx + 1) % len].id;
+  }
+
+  /** 安全读取 localStorage（file:// 下可能被拦截） */
+  function lsGet(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  /** 安全写入 localStorage */
+  function lsSet(key, val) {
+    try { localStorage.setItem(key, val); } catch (e) { /* 忽略 */ }
+  }
+
+  // 初始化线路 id
+  var saved = lsGet(LS_KEY);
+  var first = DATA.groups[0] && DATA.groups[0].accounts[0];
+  var initialLineId = saved && lineById(saved).id === saved
+    ? saved
+    : (first ? defaultLineId(first) : DATA.lines[0].id);
+
+  new Vue({
+    el: "#app",
+
+    data: function () {
+      return {
+        lineId: initialLineId, // 当前全局线路 id
+        spun: false,           // 切换按钮旋转动画状态
+      };
+    },
+
+    computed: {
+      // 当前线路对象（含 id / name / host / color）
+      renderLine: function () {
+        return lineById(this.lineId);
+      },
+      // 分组列表透传给模板
+      groups: function () {
+        return DATA.groups;
+      },
+      // 账号总数
+      total: function () {
+        var n = 0;
+        DATA.groups.forEach(function (g) { n += g.accounts.length; });
+        return n;
+      },
+    },
+
+    watch: {
+      // 线路变化时持久化
+      lineId: function (id) {
+        lsSet(LS_KEY, id);
+      },
+    },
+
+    methods: {
+      /** 把账号 url 的域名替换成当前线路 */
+      buildUrl: function (url) {
+        try {
+          var u = new URL(url);
+          u.host = this.renderLine.host;
+          return u.toString();
+        } catch (e) {
+          return url;
+        }
+      },
+
+      /** 切换到下一条线路 */
+      swapLine: function () {
+        this.lineId = nextLineId(this.lineId);
+        this.spun = !this.spun;
+        this.toast("已切换到 " + this.renderLine.name + " 线路");
+      },
+
+      /** 轻提示 */
+      toast: function (msg) {
+        var t = document.getElementById("toast");
+        if (!t) return;
+        t.textContent = msg;
+        t.classList.add("show");
+        var self = this;
+        clearTimeout(self._toastTimer);
+        self._toastTimer = setTimeout(function () {
+          t.classList.remove("show");
+        }, 1600);
+      },
+    },
+  });
+})();
+</script>
 </body>
 </html>

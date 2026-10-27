@@ -118,23 +118,6 @@ body {
   color: var(--sub);
   font-weight: 400;
 }
-/* 分组标题右侧的「全部打开」按钮 */
-.open-group {
-  margin-left: auto; /* 推到标题栏最右 */
-  font-size: 12px;
-  font-weight: 500;
-  padding: 4px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(139, 92, 246, 0.4);
-  background: rgba(139, 92, 246, 0.12);
-  color: #c4b5fd;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.open-group:hover {
-  background: rgba(139, 92, 246, 0.28);
-  color: #ede9fe;
-}
 
 /* ===== 卡片网格 ===== */
 .grid {
