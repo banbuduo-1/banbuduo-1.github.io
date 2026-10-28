@@ -17,8 +17,11 @@
       <div class="grid">
         <a v-for="(acct, ai) in group.accounts" :key="ai"
            class="card"
+           :class="{ pressed: ai === pressedAi }"
            :href="buildUrl(acct.url)"
-           target="_blank" rel="noopener">
+           target="_blank" rel="noopener"
+           @mousedown="markPressed(ai)"
+           @touchstart.passive="markPressed(ai)">
           <div class="name" :title="acct.name">{{ acct.name }}</div>
         </a>
       </div>
@@ -33,6 +36,12 @@ import { buildUrl } from "../store";
 
 export default {
   name: "GroupView",
+
+  data() {
+    return {
+      pressedAi: -1, // 当前按下的卡片下标（-1 表示无）
+    };
+  },
 
   computed: {
     // 当前分组对象：按路由参数中的下标取，越界时返回 null
@@ -52,6 +61,11 @@ export default {
   methods: {
     // 透传全局 buildUrl（模板中生成账号跳转链接）
     buildUrl,
+
+    /** 标记按下的卡片：保持高亮直到按下下一张 */
+    markPressed(ai) {
+      this.pressedAi = ai;
+    },
 
     /** 返回主页面 */
     goBack() {

@@ -169,6 +169,13 @@ body {
 .card:active {
   transform: scale(0.96);
 }
+/* 按下保持态：按下卡片后持续高亮，直到按下下一张（拖拽链接时也能看清按的是哪张） */
+.card.pressed {
+  transform: scale(0.96);
+  border-color: var(--acc);
+  background: rgba(167, 139, 250, 0.18);
+  box-shadow: 0 0 0 1px var(--acc), 0 4px 16px rgba(167, 139, 250, 0.25);
+}
 /* 桌面端悬停反馈 */
 @media (hover: hover) {
   .card:hover {
