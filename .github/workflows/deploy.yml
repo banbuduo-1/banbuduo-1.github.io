@@ -1,0 +1,66 @@
+# ============================================================
+# GitHub Actions 自动部署工作流
+# 功能：推送到 main 分支后自动构建并部署到 GitHub Pages
+# 前置条件：仓库 Settings → Pages → Source 选择 "GitHub Actions"
+# ============================================================
+name: Deploy to GitHub Pages
+
+on:
+  # 推送到 main 分支时触发
+  push:
+    branches: [main]
+  # 支持在 Actions 页面手动触发
+  workflow_dispatch:
+
+# 配置 GITHUB_TOKEN 权限，允许部署到 Pages
+permissions:
+  pages: write      # 写入 Pages
+  id-token: write   # OIDC 验证（Pages 部署必需）
+
+# 并发控制：同一时刻只允许一次部署，新推送会取消进行中的旧任务
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  # ===== 构建任务：安装依赖并打包 =====
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 拉取仓库代码
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      # 安装 Node.js 并启用 npm 缓存加速
+      - name: 配置 Node 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # 按 package-lock.json 严格安装依赖
+      - name: 安装依赖
+        run: npm ci
+
+      # 构建生产版本，产物输出到 dist/
+      - name: 构建项目
+        run: npm run build
+
+      # 上传构建产物作为 Pages 部署包
+      - name: 上传 Pages 产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  # ===== 部署任务：发布到 GitHub Pages =====
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      # 部署完成后在 Actions 页面显示站点地址
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

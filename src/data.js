@@ -1,8 +1,6 @@
 // ============================================================
-// 书签数据配置文件（JSON 结构）
-// 说明：因浏览器本地打开(file://)时禁止读取 .json 文件，
-//       故数据以 .js 文件承载，内容就是纯 JSON 结构。
-//       换 token / 加线路 / 加账号，编辑本文件即可。
+// 书签数据配置文件（ES Module 版本）
+// 说明：换 token / 加线路 / 加账号，编辑本文件即可。
 // ============================================================
 // 【如何更换过期链接】
 //   在下方 groups 中找到对应账号，直接整体替换其 url 即可
@@ -12,7 +10,6 @@
 //   在 lines 数组末尾追加一项，例如：
 //   { "id": "xx", "name": "新域名", "host": "xxx.example.com", "path": "/login.php", "color": "#f59e0b" }
 //   path 表示登录入口路径，不同线路可能不同（/login.php 或 /dldl 等）。
-//   之后在页面上每个账号切换线路时即可循环选到它。
 //   账号的默认线路会根据 url 中的域名自动匹配 lines 里的 host，
 //   无需手动指定；匹配不到时回退到第一条线路。
 //
@@ -20,7 +17,7 @@
 //   在某个 groups 项的 accounts 数组里追加：
 //   { "name": "新账号", "url": "https://域名/login.php?gid=...&token=...&time=...&sign=..." }
 // ============================================================
-window.APP_DATA = {
+export default {
   "lines": [
     {
       "id": "1",
@@ -230,6 +227,13 @@ window.APP_DATA = {
           "url": "https://app.xxh5.z7xz.com/login.php?gid=1002997&pid=1&token=BASE64YmEwM05NakUzc1JBVDFYSDZ4QU1YbG1tSWsrTVk4aWtBQk5YTWxsQnV5MU53TEhZMW40VjRTVDFNWUtTdW8yeDZkK2NuSWRobVBtOVpFVDY0aFZRS0t2RFNzc2xPQy9VRkMzc2RJd3VSRWVHTmw5ZXU3bHV1RXpvRzJTZk1ZZVFrWGE1eDdYUW9sUndCdzBiWHVxVUJ4V0E1QS82Qnl4Yzh6Z0d1VzVBNk01Y0Q3QjdLWTljeVlZbnBQWnhhajVUcElnMUc2MERaL0VVMnFXOXhXekVIUGExTWlmemlsUmNTUkNkZ1ZDSnNuVndrZU5RRWNpd3NlN1phK0VuU09yQUNIK0pBYVo1MnhkWlV0ajlsVFhn&time=1791657834&sign=03f20e899fafb2f94b332c1fb8fb4399&appVer=1020&platCode=37wan&IMEI=356597535607247&isPcLauncher=true"
         }
       ]
-    }
+    },
+    { "name": "小号",
+      "accounts": [
+        {
+          "name": "小号",
+          "url": "https://app.xxh5.z7xz.com/login.php?gid=1002997&pid=1&token=BASE64YmEwM05NakUzc1JBVDFYSDZ4QU1YbG1tSWsrTVk4aWtBQk5YTWxsQnV5MU53TEhZMW40VjRTVDFNWUtTdW8yeDZkK2NuSWRobVBtOVpFVDY0aFZRS0t2RFNzc2xPQy9VRkMzc2RJd3VSRWVHTmw5ZXU3bHV1RXpvRzJTZk1ZZVFrWGE1eDdYUW9sUndCdzBiWHVxVUJ4V0E1QS82Qnl4Yzh6Z0d1VzVBNk01Y0Q3QjdLWTljeVlZbnBQWnhhajVUcElnMUc2MERaL0VVMnFXOXhXekVIUGExTWlmemlsUmNTUkNkZ1ZDSnNuVndrZU5RRWNpd3NlN1phK0VuU09yQUNIK0pBYVo1MnhkWlV0ajlsVFhn&time=1791657834&sign=03f20e899fafb2f94b332c1fb8fb4399&appVer=1020&platCode=37wan&IMEI=356597535607247&isPcLauncher=true"
+        }
+      ] }
   ]
 };
