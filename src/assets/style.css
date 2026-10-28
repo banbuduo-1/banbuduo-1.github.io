@@ -43,7 +43,8 @@ body {
   pointer-events: none;
 }
 
-/* 单片花瓣：背景图由 JS 写入的 --petal-img 提供 */
+/* 单片花瓣：背景图由 JS 写入的 --petal-img 提供
+   位置与旋转每帧由 JS 通过 transform 写入，可跟随鼠标/手指聚拢 */
 .sakura {
   position: absolute;
   top: 0;
@@ -51,32 +52,7 @@ body {
   background-image: var(--petal-img);
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  animation-name: sakura-fall;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  will-change: transform, opacity; /* 提示浏览器走合成层，动画更顺滑 */
-}
-
-/* 飘落关键帧：从顶部飘入、左右摇摆、旋转着落出底部 */
-@keyframes sakura-fall {
-  0% {
-    transform: translate3d(0, -12vh, 0) rotate(0deg);
-    opacity: 0;
-  }
-  8% {
-    opacity: var(--op, 0.8);
-  }
-  50% {
-    /* --sway 由每片花瓣随机指定，形成不同摆动幅度 */
-    transform: translate3d(var(--sway, 80px), 45vh, 0) rotate(220deg);
-  }
-  92% {
-    opacity: var(--op, 0.8);
-  }
-  100% {
-    transform: translate3d(0, 112vh, 0) rotate(540deg);
-    opacity: 0;
-  }
+  will-change: transform; /* 提示浏览器走合成层，更新更顺滑 */
 }
 
 .wrap {
@@ -126,6 +102,10 @@ body {
   font-weight: 600;
   border: none;
 }
+/* 选择线路按钮：粉紫渐变 + 樱粉投影，与主题呼应 */
+.global-bar .swap-btn.van-button {
+  box-shadow: 0 6px 16px rgba(224, 105, 154, 0.32);
+}
 /* Vant 按钮按下反馈 */
 .global-bar .van-button:active {
   transform: scale(0.97);
@@ -137,14 +117,14 @@ body {
   font-size: 15px;
 }
 
-/* 下载游戏按钮：绿色描边 + 淡绿底，避免被渐变背景抢视觉 */
+/* 下载游戏按钮：樱粉描边 + 淡粉底，与主题统一 */
 .global-bar .dl-btn.van-button {
-  border: 1px solid rgba(22, 163, 74, 0.45);
-  background: rgba(22, 163, 74, 0.10);
-  color: #15803d;
+  border: 1px solid rgba(224, 105, 154, 0.42);
+  background: rgba(224, 105, 154, 0.09);
+  color: #c25685;
 }
 .global-bar .dl-btn.van-button:active {
-  background: rgba(22, 163, 74, 0.2);
+  background: rgba(224, 105, 154, 0.2);
 }
 
 /* 移动端隐藏下载按钮（.exe 只给 PC 用） */
@@ -301,13 +281,27 @@ body {
 /* ===== 线路选择弹窗（Vant Popup） ===== */
 .picker-popup.van-popup {
   background: var(--panel);
+  /* 顶部一层极淡粉光，与页面背景衔接 */
+  background-image: linear-gradient(180deg, rgba(255, 233, 243, 0.85), rgba(255, 253, 254, 0) 120px);
 }
 .picker-title {
+  position: relative;
   font-size: 15px;
   font-weight: 700;
   text-align: center;
   padding: 18px 0 10px;
   color: var(--txt);
+  letter-spacing: 1px;
+}
+/* 标题下方一小段樱粉短线，替代生硬的分割线 */
+.picker-title::after {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 3px;
+  margin: 8px auto 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #f58fb6, #b98cd8);
 }
 /* 弹窗内单元格适配 */
 .picker-popup .van-cell {
@@ -337,10 +331,12 @@ body {
 .picker-footer {
   padding: 6px 16px 20px;
 }
+/* 取消按钮：樱粉描边 + 淡粉底，弱化视觉权重 */
 .picker-footer .van-button {
-  border-color: var(--card-br);
-  background: #fbf6f9;
-  color: var(--sub);
+  border-color: rgba(224, 105, 154, 0.35);
+  background: rgba(224, 105, 154, 0.06);
+  color: #c25685;
+  border-radius: 10px;
 }
 
 footer {

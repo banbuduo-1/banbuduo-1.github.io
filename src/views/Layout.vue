@@ -5,9 +5,9 @@
     <!-- 底部悬浮：全局线路切换条 + 下载按钮（所有页面均显示） -->
     <div class="global-bar">
       <span class="label">当前线路：<b :style="{ color: renderLine.color }">{{ renderLine.name }}</b></span>
-      <!-- 线路切换：Vant 按钮，渐变底色 -->
+      <!-- 线路切换：Vant 按钮，樱粉→淡紫渐变（与樱花主题呼应） -->
       <van-button class="swap-btn" round
-                  color="linear-gradient(90deg,#16a34a,#a78bfa 55%,#2563eb)"
+                  color="linear-gradient(90deg,#f58fb6,#e0699a 55%,#b98cd8)"
                   @click="openPicker">
         <van-icon name="exchange" class="btn-ico" />选择线路
       </van-button>
@@ -34,9 +34,9 @@
           <template #icon>
             <span class="dot" :style="{ background: ln.color }"></span>
           </template>
-          <!-- 右侧：当前线路标记 -->
+          <!-- 右侧：当前线路标记（用主题樱粉色，替换 Vant 默认蓝） -->
           <template #right-icon>
-            <van-tag v-if="ln.id === store.lineId" type="primary" round>当前</van-tag>
+            <van-tag v-if="ln.id === store.lineId" color="#e0699a" round>当前</van-tag>
             <van-icon v-else name="arrow" class="ln-arrow" />
           </template>
         </van-cell>
