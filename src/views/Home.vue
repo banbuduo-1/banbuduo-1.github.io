@@ -6,16 +6,15 @@
       <div class="home-sub">共 {{ total }} 个账号 · 选择要进入的模块</div>
     </div>
 
-    <!-- 分组入口卡片列表 -->
-    <div class="home-grid">
-      <router-link v-for="(g, gi) in groups" :key="gi"
-                   class="home-card"
-                   :to="'/group/' + gi">
-        <div class="home-card-name">{{ displayName(g, gi) }}</div>
-        <div class="home-card-count">{{ g.accounts.length }} 个账号</div>
-        <div class="home-card-arrow">→</div>
-      </router-link>
-    </div>
+    <!-- 模块入口列表（Vant 单元格组） -->
+    <van-cell-group inset :border="false" class="home-list">
+      <van-cell v-for="(g, gi) in groups" :key="gi"
+                :title="displayName(g, gi)"
+                :label="g.accounts.length + ' 个账号'"
+                icon="bookmark-o"
+                is-link clickable
+                @click="goGroup(gi)" />
+    </van-cell-group>
   </main>
 </template>
 
@@ -40,6 +39,11 @@ export default {
   },
 
   methods: {
+    /** 进入指定分组子页面 */
+    goGroup(gi) {
+      this.$router.push("/group/" + gi);
+    },
+
     /**
      * 分组显示名：同名分组自动追加序号，便于区分
      * 例如多个「小号」显示为 小号（1）、小号（2）…

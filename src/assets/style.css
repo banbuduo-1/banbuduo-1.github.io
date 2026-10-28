@@ -1,6 +1,6 @@
 /* ============================================================
-   游戏书签页样式表
-   深色主题卡片布局，适配手机与电脑
+   游戏书签页样式表（Vant 2 版 · 浅色樱花主题）
+   偏白背景 + Vant 组件样式覆盖，适配手机与电脑
    ============================================================ */
 
 /* ===== 基础重置 ===== */
@@ -12,27 +12,76 @@
 }
 
 :root {
-  --card: rgba(255, 255, 255, 0.06);   /* 卡片底色 */
-  --card-br: rgba(255, 255, 255, 0.10);/* 卡片描边 */
-  --txt: #eef0ff;                      /* 主文字色 */
-  --sub: #9aa0c3;                      /* 次要文字色 */
-  --acc: #a78bfa;                      /* 强调色 */
+  --card: rgba(255, 255, 255, 0.72);     /* 卡片底色：白色半透 */
+  --card-br: rgba(214, 140, 170, 0.28);  /* 卡片描边：浅樱粉 */
+  --txt: #3d2b38;                        /* 主文字：深灰紫 */
+  --sub: #8a7b88;                        /* 次要文字 */
+  --acc: #e0699a;                        /* 强调色：樱粉 */
+  --panel: #fffdfe;                      /* 弹层面板底色 */
 }
 
 body {
   font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-  /* 多层径向 + 线性渐变构成深色星空背景 */
+  /* 浅色樱花主题背景：白粉基调 + 淡紫/淡蓝光晕 */
   background:
-    radial-gradient(1200px 800px at 80% -10%, #2b1a5e 0%, transparent 60%),
-    radial-gradient(1000px 700px at -10% 110%, #12305e 0%, transparent 55%),
-    linear-gradient(160deg, #0f1226, #1a1040);
+    radial-gradient(900px 600px at 85% -10%, #ffe3ee 0%, transparent 60%),
+    radial-gradient(800px 600px at -10% 110%, #e6efff 0%, transparent 55%),
+    linear-gradient(165deg, #fffafc, #fff1f6 45%, #f7f4ff);
   background-attachment: fixed;
   color: var(--txt);
   min-height: 100vh;
   padding-bottom: 40px;
 }
 
+/* ===== 樱花飘落特效 ===== */
+/* 固定全屏容器：裁掉超出视口的花瓣，且不拦截点击/拖拽 */
+.sakura-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;           /* 位于内容层之下 */
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* 单片花瓣：背景图由 JS 写入的 --petal-img 提供 */
+.sakura {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-image: var(--petal-img);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  animation-name: sakura-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity; /* 提示浏览器走合成层，动画更顺滑 */
+}
+
+/* 飘落关键帧：从顶部飘入、左右摇摆、旋转着落出底部 */
+@keyframes sakura-fall {
+  0% {
+    transform: translate3d(0, -12vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: var(--op, 0.8);
+  }
+  50% {
+    /* --sway 由每片花瓣随机指定，形成不同摆动幅度 */
+    transform: translate3d(var(--sway, 80px), 45vh, 0) rotate(220deg);
+  }
+  92% {
+    opacity: var(--op, 0.8);
+  }
+  100% {
+    transform: translate3d(0, 112vh, 0) rotate(540deg);
+    opacity: 0;
+  }
+}
+
 .wrap {
+  position: relative;
+  z-index: 1;           /* 内容层置于花瓣之上 */
   max-width: 1100px;
   margin: 0 auto;
   padding: 20px 16px 88px; /* 底部留白：避免被悬浮的切换按钮遮挡 */
@@ -47,7 +96,7 @@ body {
   z-index: 50;
   max-width: 640px;
   width: calc(100% - 24px);
-  background: rgba(20, 22, 48, 0.88);
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(12px);
   border: 1px solid var(--card-br);
   border-radius: 16px;
@@ -55,275 +104,52 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 26px rgba(176, 122, 152, 0.18);
 }
 .global-bar .label {
   font-size: 13px;
   color: var(--sub);
   white-space: nowrap;
 }
-/* 标签里的当前线路名，颜色由 JS 根据线路动态设置 */
+/* 标签里的当前线路名，颜色由内联 style 动态设置 */
 .global-bar .label b {
   font-weight: 700;
   margin-left: 2px;
 }
-.swap-btn {
+
+/* 两个 Vant 按钮平分剩余宽度，统一高度与字号 */
+.global-bar .van-button {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: none;
+  height: 42px;
   border-radius: 12px;
-  cursor: pointer;
-  padding: 12px 10px;
   font-size: 15px;
   font-weight: 600;
-  color: #fff;
-  background: linear-gradient(90deg, #16a34a, #a78bfa 55%, #2563eb);
-  transition: transform 0.15s, filter 0.15s;
-  text-decoration: none;
+  border: none;
 }
-.swap-btn:active {
+/* Vant 按钮按下反馈 */
+.global-bar .van-button:active {
   transform: scale(0.97);
-  filter: brightness(1.15);
+  filter: brightness(1.08);
+}
+/* 按钮内图标与文字间距 */
+.global-bar .btn-ico {
+  margin-right: 6px;
+  font-size: 15px;
 }
 
-/* 下载游戏按钮（独立样式，避免被渐变背景抢视觉） */
-.dl-btn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  border: 1px solid rgba(34, 197, 94, 0.5);
-  border-radius: 12px;
-  cursor: pointer;
-  padding: 12px 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #86efac;
-  background: rgba(34, 197, 94, 0.12);
-  text-decoration: none;
-  transition: transform 0.15s, background 0.15s;
+/* 下载游戏按钮：绿色描边 + 淡绿底，避免被渐变背景抢视觉 */
+.global-bar .dl-btn.van-button {
+  border: 1px solid rgba(22, 163, 74, 0.45);
+  background: rgba(22, 163, 74, 0.10);
+  color: #15803d;
 }
-.dl-btn:active {
-  transform: scale(0.97);
-  background: rgba(34, 197, 94, 0.25);
+.global-bar .dl-btn.van-button:active {
+  background: rgba(22, 163, 74, 0.2);
 }
+
 /* 移动端隐藏下载按钮（.exe 只给 PC 用） */
 @media (max-width: 640px) {
-  .dl-btn { display: none; }
-}
-
-/* ===== 分组 ===== */
-.group {
-  margin-top: 22px;
-}
-.group-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 16px;
-  font-weight: 700;
-  margin: 0 2px 12px;
-}
-.group-title .bar {
-  width: 4px;
-  height: 18px;
-  border-radius: 2px;
-  background: linear-gradient(180deg, var(--acc), #3b82f6);
-}
-.group-title .count {
-  font-size: 12px;
-  color: var(--sub);
-  font-weight: 400;
-}
-
-/* ===== 卡片网格 ===== */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
-}
-/* 极窄屏（小手机）固定两列 */
-@media (max-width: 380px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: var(--card);
-  border: 1px solid var(--card-br);
-  border-radius: 14px;
-  padding: 14px 10px 10px;
-  text-decoration: none;
-  color: var(--txt);
-  transition: transform 0.15s, border-color 0.15s, background 0.15s;
-}
-.card:active {
-  transform: scale(0.96);
-}
-/* 按下保持态：按下卡片后持续高亮，直到按下下一张（拖拽链接时也能看清按的是哪张） */
-.card.pressed {
-  transform: scale(0.96);
-  border-color: var(--acc);
-  background: rgba(167, 139, 250, 0.18);
-  box-shadow: 0 0 0 1px var(--acc), 0 4px 16px rgba(167, 139, 250, 0.25);
-}
-/* 桌面端悬停反馈 */
-@media (hover: hover) {
-  .card:hover {
-    transform: translateY(-3px);
-    border-color: rgba(167, 139, 250, 0.5);
-    background: rgba(255, 255, 255, 0.09);
-  }
-}
-
-.name {
-  font-size: 15px;
-  font-weight: 600;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ===== Toast 轻提示 ===== */
-#toast {
-  position: fixed;
-  left: 50%;
-  bottom: 36px;
-  transform: translateX(-50%) translateY(20px);
-  background: rgba(30, 32, 64, 0.95);
-  color: #fff;
-  border: 1px solid var(--card-br);
-  padding: 10px 20px;
-  border-radius: 12px;
-  font-size: 13px;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.25s;
-  z-index: 99;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-}
-#toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-footer {
-  text-align: center;
-  color: var(--sub);
-  font-size: 11px;
-  margin-top: 34px;
-}
-
-/* ===== 线路选择弹窗 ===== */
-.picker-mask {
-  position: fixed;
-  inset: 0;
-  background: rgba(5, 8, 20, 0.65);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  z-index: 100;
-}
-.picker-panel {
-  width: 100%;
-  max-width: 480px;
-  background: #1a1d3a;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  padding: 18px 16px 24px;
-  border: 1px solid var(--card-br);
-  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
-}
-.picker-title {
-  font-size: 15px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 14px;
-  color: var(--txt);
-}
-.picker-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.picker-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1.5px solid var(--card-br);
-  border-radius: 12px;
-  color: var(--txt);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.picker-item:active {
-  transform: scale(0.97);
-}
-.picker-item.active {
-  background: rgba(167, 139, 250, 0.15);
-  font-weight: 700;
-}
-.picker-item .dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.picker-item .ln-name {
-  flex: 1;
-  text-align: left;
-}
-.picker-item .ln-current {
-  font-size: 11px;
-  color: #a78bfa;
-  font-weight: 600;
-}
-.picker-close {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid var(--card-br);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--sub);
-  font-size: 14px;
-  cursor: pointer;
-}
-.picker-close:active {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* 弹窗淡入淡出过渡 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s;
-}
-.fade-enter-active .picker-panel,
-.fade-leave-active .picker-panel {
-  transition: transform 0.22s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-.fade-enter .picker-panel,
-.fade-leave-to .picker-panel {
-  transform: translateY(100%);
+  .global-bar .dl-btn { display: none; }
 }
 
 /* ===== 主页面（模块选择） ===== */
@@ -342,83 +168,184 @@ footer {
   color: var(--sub);
 }
 
-/* 模块入口卡片网格 */
-.home-grid {
-  margin-top: 24px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
+/* 模块列表：Vant CellGroup 浅色适配 */
+.home-list.van-cell-group--inset {
+  margin: 24px 0 0;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--card);
+  box-shadow: 0 6px 24px rgba(176, 122, 152, 0.12);
 }
-.home-card {
+.home-list .van-cell {
+  background: transparent;
+  padding: 16px;
+}
+.home-list .van-cell::after {
+  border-color: rgba(214, 140, 170, 0.18); /* 分割线改为浅樱粉 */
+}
+.home-list .van-cell__title {
+  color: var(--txt);
+  font-size: 17px;
+  font-weight: 700;
+}
+.home-list .van-cell__label {
+  color: var(--sub);
+  font-size: 12px;
+  margin-top: 4px;
+}
+/* 左侧小图标用强调色 */
+.home-list .van-cell__left-icon {
+  color: var(--acc);
+  font-size: 20px;
+  margin-right: 12px;
+}
+/* 右侧箭头 */
+.home-list .van-cell__right-icon {
+  color: var(--sub);
+}
+
+/* ===== 子页面导航条（Vant NavBar） ===== */
+.group-nav.van-nav-bar {
+  background: transparent;
+}
+.group-nav.van-nav-bar::after {
+  border-bottom: none; /* 去掉导航栏底部分割线 */
+}
+.group-nav .van-nav-bar__title {
+  color: var(--txt);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 1px;
+}
+.group-nav .van-nav-bar__text,
+.group-nav .van-nav-bar__arrow {
+  color: var(--acc); /* 返回按钮用强调色 */
+}
+/* 右侧账号数量 */
+.nav-count {
+  font-size: 12px;
+  color: var(--sub);
+}
+
+/* ===== 账号卡片网格（Vant Grid 适配） ===== */
+/* 用 CSS Grid 覆盖 Vant 固定列宽，实现自适应列数 */
+.acct-grid.van-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+  padding: 0;
+}
+/* 取消 Vant 按 columnNum 计算的百分比宽度 */
+.acct-grid .van-grid-item {
+  width: auto !important;
+}
+/* 宫格内容去掉内边距与默认底，由内部 a 卡片撑满 */
+.acct-grid .van-grid-item__content {
+  padding: 0;
+  height: 100%;
+  background: transparent;
+}
+/* 极窄屏（小手机）固定两列 */
+@media (max-width: 380px) {
+  .acct-grid.van-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 账号卡片（保持 a 标签，便于拖动拉出链接） */
+.card {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
   background: var(--card);
   border: 1px solid var(--card-br);
-  border-radius: 16px;
-  padding: 22px 18px;
+  border-radius: 14px;
+  padding: 14px 10px 10px;
   text-decoration: none;
   color: var(--txt);
   transition: transform 0.15s, border-color 0.15s, background 0.15s;
 }
-.home-card:active {
-  transform: scale(0.97);
+.card:active {
+  transform: scale(0.96);
+}
+/* 按下保持态：按下卡片后持续高亮，直到按下下一张（拖拽链接时也能看清按的是哪张） */
+.card.pressed {
+  transform: scale(0.96);
+  border-color: var(--acc);
+  background: rgba(224, 105, 154, 0.14);
+  box-shadow: 0 0 0 1px var(--acc), 0 4px 16px rgba(224, 105, 154, 0.22);
 }
 /* 桌面端悬停反馈 */
 @media (hover: hover) {
-  .home-card:hover {
+  .card:hover {
     transform: translateY(-3px);
-    border-color: rgba(167, 139, 250, 0.5);
-    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(224, 105, 154, 0.45);
+    background: rgba(255, 255, 255, 0.92);
   }
 }
-.home-card-name {
-  font-size: 19px;
-  font-weight: 700;
-}
-.home-card-count {
-  font-size: 13px;
-  color: var(--sub);
-}
-/* 右侧箭头指示 */
-.home-card-arrow {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 18px;
-  color: var(--acc);
+
+.name {
+  font-size: 15px;
+  font-weight: 600;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* ===== 子页面顶部（返回按钮 + 标题） ===== */
-.page-head {
-  margin-top: 22px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+/* ===== 线路选择弹窗（Vant Popup） ===== */
+.picker-popup.van-popup {
+  background: var(--panel);
 }
-.page-head .group-title {
-  margin: 0; /* 覆盖原分组标题的下边距 */
+.picker-title {
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  padding: 18px 0 10px;
+  color: var(--txt);
 }
-.back-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid var(--card-br);
-  border-radius: 12px;
-  background: var(--card);
+/* 弹窗内单元格适配 */
+.picker-popup .van-cell {
+  background: transparent;
+}
+.picker-popup .van-cell__title {
   color: var(--txt);
   font-size: 14px;
-  font-weight: 600;
-  padding: 9px 14px;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.15s;
+  font-weight: 500;
 }
-.back-btn:active {
-  transform: scale(0.96);
-  background: rgba(255, 255, 255, 0.1);
+.picker-popup .van-cell::after {
+  border-color: rgba(214, 140, 170, 0.18);
 }
-.back-ico {
-  font-size: 16px;
+/* 线路颜色圆点 */
+.picker-popup .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+/* 未选中线路的右侧箭头 */
+.picker-popup .ln-arrow {
+  color: var(--sub);
+}
+/* 底部取消按钮区 */
+.picker-footer {
+  padding: 6px 16px 20px;
+}
+.picker-footer .van-button {
+  border-color: var(--card-br);
+  background: #fbf6f9;
+  color: var(--sub);
+}
+
+footer {
+  text-align: center;
+  color: var(--sub);
+  font-size: 11px;
+  margin-top: 34px;
 }
