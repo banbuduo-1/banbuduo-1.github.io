@@ -318,3 +318,100 @@ footer {
 .fade-leave-to .picker-panel {
   transform: translateY(100%);
 }
+
+/* ===== 主页面（模块选择） ===== */
+.home-head {
+  margin-top: 26px;
+  text-align: center;
+}
+.home-title {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+.home-sub {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--sub);
+}
+
+/* 模块入口卡片网格 */
+.home-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.home-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--card-br);
+  border-radius: 16px;
+  padding: 22px 18px;
+  text-decoration: none;
+  color: var(--txt);
+  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+}
+.home-card:active {
+  transform: scale(0.97);
+}
+/* 桌面端悬停反馈 */
+@media (hover: hover) {
+  .home-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(167, 139, 250, 0.5);
+    background: rgba(255, 255, 255, 0.09);
+  }
+}
+.home-card-name {
+  font-size: 19px;
+  font-weight: 700;
+}
+.home-card-count {
+  font-size: 13px;
+  color: var(--sub);
+}
+/* 右侧箭头指示 */
+.home-card-arrow {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: var(--acc);
+}
+
+/* ===== 子页面顶部（返回按钮 + 标题） ===== */
+.page-head {
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.page-head .group-title {
+  margin: 0; /* 覆盖原分组标题的下边距 */
+}
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--card-br);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--txt);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.back-btn:active {
+  transform: scale(0.96);
+  background: rgba(255, 255, 255, 0.1);
+}
+.back-ico {
+  font-size: 16px;
+}

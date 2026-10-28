@@ -1,9 +1,11 @@
 // ============================================================
 // 应用入口文件
-// 功能：创建 Vue 根实例并挂载到 #app
+// 功能：创建 Vue 根实例（挂载路由）并挂载到 #app
 // ============================================================
 import Vue from "vue";
 import App from "./App.vue";
+// 引入路由
+import router from "./router";
 // 引入全局样式
 import "./assets/style.css";
 
@@ -11,6 +13,6 @@ import "./assets/style.css";
 Vue.config.productionTip = false;
 
 new Vue({
-  // 渲染根组件
-  render: (h) => h(App),
+  router,              // 注入路由实例
+  render: (h) => h(App), // 渲染根组件
 }).$mount("#app");

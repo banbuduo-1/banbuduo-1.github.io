@@ -228,12 +228,5 @@ export default {
         }
       ]
     },
-    { "name": "小号",
-      "accounts": [
-        {
-          "name": "小号",
-          "url": "https://app.xxh5.z7xz.com/login.php?gid=1002997&pid=1&token=BASE64YmEwM05NakUzc1JBVDFYSDZ4QU1YbG1tSWsrTVk4aWtBQk5YTWxsQnV5MU53TEhZMW40VjRTVDFNWUtTdW8yeDZkK2NuSWRobVBtOVpFVDY0aFZRS0t2RFNzc2xPQy9VRkMzc2RJd3VSRWVHTmw5ZXU3bHV1RXpvRzJTZk1ZZVFrWGE1eDdYUW9sUndCdzBiWHVxVUJ4V0E1QS82Qnl4Yzh6Z0d1VzVBNk01Y0Q3QjdLWTljeVlZbnBQWnhhajVUcElnMUc2MERaL0VVMnFXOXhXekVIUGExTWlmemlsUmNTUkNkZ1ZDSnNuVndrZU5RRWNpd3NlN1phK0VuU09yQUNIK0pBYVo1MnhkWlV0ajlsVFhn&time=1791657834&sign=03f20e899fafb2f94b332c1fb8fb4399&appVer=1020&platCode=37wan&IMEI=356597535607247&isPcLauncher=true"
-        }
-      ] }
   ]
 };
