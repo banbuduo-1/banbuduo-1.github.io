@@ -24,7 +24,7 @@
 
     <!-- 线路选择弹窗（Vant 底部弹出层） -->
     <van-popup v-model="showPicker" position="bottom" round
-               safe-area-inset-bottom class="picker-popup">
+               :duration="0" safe-area-inset-bottom class="picker-popup">
       <div class="picker-title">选择线路</div>
       <van-cell-group :border="false">
         <van-cell v-for="ln in lineList" :key="ln.id"

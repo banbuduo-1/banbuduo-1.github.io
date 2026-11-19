@@ -34,13 +34,6 @@ export default {
       "color": "#3b82f6"
     },
     {
-      "id": "3",
-      "name": "七兔",
-      "host": "7tu7tu.com",
-      "path": "/dldl",
-      "color": "#f97316"
-    },
-    {
       "id": "4",
       "name": "新玩",
       "host": "xinwan.xinwanwl.com",
