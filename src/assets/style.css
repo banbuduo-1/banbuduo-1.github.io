@@ -316,3 +316,427 @@ footer {
   font-size: 11px;
   margin-top: 34px;
 }
+
+/* ===== ETF 数据查询页（独立页，深色金融风） ===== */
+.etf-page {
+  /* 本页专用配色变量：深蓝底 + 蓝色主色 */
+  --etf-card: rgba(255, 255, 255, 0.05);
+  --etf-br: rgba(255, 255, 255, 0.09);
+  --etf-txt: #e8eef9;
+  --etf-sub: #8ea0bd;
+  --etf-acc: #4f8cff;
+  --etf-up: #ff5f5f;   /* 涨：红 */
+  --etf-down: #21c08b; /* 跌：绿 */
+
+  min-height: 100vh;
+  padding: 6px 16px 56px;
+  color: var(--etf-txt);
+  /* 深色底：顶部蓝色光晕 + 纵向渐变，覆盖全屏 */
+  background:
+    radial-gradient(900px 520px at 84% -12%, rgba(64, 110, 220, 0.30) 0%, transparent 60%),
+    radial-gradient(760px 480px at -12% 108%, rgba(28, 78, 160, 0.24) 0%, transparent 58%),
+    linear-gradient(180deg, #0b1220 0%, #0d1526 55%, #0a1120 100%);
+  background-attachment: fixed;
+}
+
+/* 独立页期间：body 统一深色底，避免底部露出浅色背景 */
+body.etf-body {
+  background: #0a1120;
+}
+
+/* 内容容器：限制宽度并居中，适配手机与桌面 */
+.etf-page > * {
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 顶部导航栏：透明底 + 浅色文字 */
+.etf-page .group-nav .van-nav-bar__title {
+  color: var(--etf-txt);
+}
+.etf-page .group-nav .van-nav-bar__text,
+.etf-page .group-nav .van-nav-bar__arrow {
+  color: var(--etf-acc);
+}
+.etf-page .group-nav .van-nav-bar__text:active {
+  background: transparent;
+}
+
+/* 查询输入区：输入框 + 按钮一行排布 */
+.etf-search {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+.etf-input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--etf-br);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--etf-txt);
+  font-size: 15px;
+  outline: none;
+  caret-color: var(--etf-acc);
+}
+.etf-input::placeholder {
+  color: #6b7f9e;
+}
+.etf-input:focus {
+  border-color: rgba(79, 140, 255, 0.65);
+  background: rgba(79, 140, 255, 0.10);
+}
+.etf-btn.van-button {
+  flex: 0 0 96px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 8px 20px rgba(47, 111, 224, 0.35);
+}
+/* 操作说明小字 */
+.etf-sample {
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--etf-sub);
+}
+
+/* 搜索记录：标题行 + 可换行的胶囊标签 */
+.etf-history {
+  margin-top: 10px;
+}
+.etf-history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--etf-sub);
+}
+.etf-history-clear {
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  color: #6b7f9e;
+  cursor: pointer;
+}
+.etf-history-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.etf-history-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--etf-br);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+  color: #cfe0ff;
+  cursor: pointer;
+}
+.etf-history-item b {
+  font-weight: 600;
+  color: var(--etf-txt);
+}
+.etf-history-item em {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-style: normal;
+  color: var(--etf-sub);
+}
+/* 单条删除按钮 */
+.etf-h-del {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1;
+  color: var(--etf-sub);
+}
+.etf-h-del:active {
+  background: rgba(255, 95, 95, 0.75);
+  color: #ffffff;
+}
+
+/* 加载中 / 空态提示 */
+.etf-tip-box {
+  margin-top: 20px;
+  padding: 28px 12px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--etf-sub);
+  background: var(--etf-card);
+  border: 1px solid var(--etf-br);
+  border-radius: 14px;
+}
+.etf-error {
+  color: #ff8a8a;
+}
+
+/* 概况卡片：蓝色渐变高光 + 深色底 */
+.etf-head {
+  margin-top: 16px;
+  padding: 18px;
+  background:
+    linear-gradient(150deg, rgba(79, 140, 255, 0.16), rgba(255, 255, 255, 0.03) 55%),
+    rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--etf-br);
+  border-radius: 16px;
+  box-shadow: 0 10px 28px rgba(3, 10, 26, 0.45);
+}
+.etf-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--etf-txt);
+}
+.etf-code {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--etf-sub);
+}
+.etf-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 10px;
+}
+.etf-price b {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+.etf-price span {
+  font-size: 14px;
+  font-weight: 600;
+}
+.etf-meta {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--etf-sub);
+}
+/* 三项核心指标 */
+.etf-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+}
+.etf-stats div {
+  text-align: center;
+}
+.etf-stats b {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--etf-txt);
+}
+.etf-stats span {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--etf-sub);
+}
+
+/* 分页容器：透明底，标签文字浅色 */
+.etf-tabs {
+  margin-top: 14px;
+}
+.etf-page .van-tabs__nav {
+  background: transparent;
+}
+.etf-page .van-tabs__wrap::after {
+  display: none; /* 去掉 Vant 默认底部分割线 */
+}
+.etf-tabs .van-tab__pane {
+  padding-top: 12px;
+}
+
+/* 数据表格：用 grid 模拟表格，四列等宽 */
+.etf-table {
+  background: var(--etf-card);
+  border: 1px solid var(--etf-br);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.etf-tr {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr;
+  gap: 4px;
+  padding: 11px 12px;
+  font-size: 13px;
+  color: var(--etf-txt);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.etf-tr:last-child {
+  border-bottom: none;
+}
+.etf-tr span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.etf-th {
+  font-size: 12px;
+  color: var(--etf-sub);
+  background: rgba(79, 140, 255, 0.10);
+}
+.etf-strong {
+  font-weight: 700;
+  color: #6ea8ff;
+}
+
+/* 指数信息键值列表 */
+.etf-index-name {
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--etf-txt);
+  background: var(--etf-card);
+  border: 1px solid var(--etf-br);
+  border-radius: 14px;
+}
+.etf-kv {
+  margin-top: 10px;
+  padding: 4px 14px;
+  background: var(--etf-card);
+  border: 1px solid var(--etf-br);
+  border-radius: 14px;
+}
+.etf-kv div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.etf-kv div:last-child {
+  border-bottom: none;
+}
+.etf-kv span {
+  color: var(--etf-sub);
+}
+.etf-kv b {
+  font-weight: 600;
+  text-align: right;
+  color: var(--etf-txt);
+}
+
+/* 说明文字 */
+.etf-note {
+  margin-top: 10px;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--etf-sub);
+}
+.etf-source {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 11px;
+  color: #6b7f9e;
+}
+/* 次要操作按钮：透明底 + 蓝色描边 */
+.etf-link-btn.van-button {
+  margin-top: 12px;
+  border-color: rgba(79, 140, 255, 0.45);
+  background: rgba(79, 140, 255, 0.10);
+  color: #6ea8ff;
+  border-radius: 10px;
+}
+
+/* 交易所基金内嵌区 */
+.etf-exchange {
+  margin-top: 26px;
+}
+.etf-exchange-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--etf-txt);
+}
+.etf-exchange-open {
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  color: #6b7f9e;
+  cursor: pointer;
+}
+/* 交易所切换：胶囊样式 */
+.etf-exchange-tabs {
+  display: inline-flex;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 3px;
+  border: 1px solid var(--etf-br);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+}
+.etf-exchange-tabs span {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--etf-sub);
+  cursor: pointer;
+}
+.etf-exchange-tabs span.active {
+  background: rgba(79, 140, 255, 0.25);
+  color: var(--etf-txt);
+}
+/* 内嵌框架：白底避免交易所浅色页面与深色卡片割裂 */
+.etf-frame {
+  display: block;
+  width: 100%;
+  height: 620px;
+  margin-top: 10px;
+  border: 1px solid var(--etf-br);
+  border-radius: 14px;
+  background: #ffffff;
+}
+.etf-frame-tip {
+  margin-top: 10px;
+  padding: 24px 16px;
+  border: 1px solid var(--etf-br);
+  border-radius: 14px;
+  background: var(--etf-card);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--etf-sub);
+  text-align: center;
+}
+.etf-frame-tip p {
+  margin: 0 0 12px;
+}
+
+/* 涨跌配色：仅用颜色区分，不做动效（红涨绿跌） */
+.etf-page .up {
+  color: var(--etf-up);
+}
+.etf-page .down {
+  color: var(--etf-down);
+}
+
+

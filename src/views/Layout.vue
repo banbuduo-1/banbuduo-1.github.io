@@ -20,7 +20,8 @@
     <!-- 路由出口：主页面 / 分组子页面 -->
     <router-view />
 
-    <footer>共 {{ total }} 个账号 · 本地多文件，手机电脑均可打开</footer>
+    <!-- 账号统计页脚：ETF 查询页不展示 -->
+    <footer v-if="$route.name !== 'etf'">共 {{ total }} 个账号 · 本地多文件，手机电脑均可打开</footer>
 
     <!-- 线路选择弹窗（Vant 底部弹出层） -->
     <van-popup v-model="showPicker" position="bottom" round

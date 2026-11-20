@@ -8,6 +8,7 @@ import VueRouter from "vue-router";
 import Layout from "../views/Layout.vue";
 import Home from "../views/Home.vue";
 import GroupView from "../views/GroupView.vue";
+import EtfView from "../views/EtfView.vue";
 
 // 安装路由插件
 Vue.use(VueRouter);
@@ -26,6 +27,8 @@ export default new VueRouter({
         { path: "group/:gi", name: "group", component: GroupView },
       ],
     },
+    // ETF 数据查询页：无首页入口，直接访问 /#/etf 进入
+    { path: "/etf", name: "etf", component: EtfView ,title:"ETF数据查询"},
     // 未知路径一律回主页面
     { path: "*", redirect: "/" },
   ],
